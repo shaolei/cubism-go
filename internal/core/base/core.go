@@ -299,6 +299,13 @@ func SetParameterValue(f *Funcs, modelPtr uintptr, id string, value float32) {
 	}
 }
 
+// GetPartOpacities returns the opacities for all parts
+func GetPartOpacities(f *Funcs, modelPtr uintptr) (rs []float32) {
+	count := f.CsmGetPartCount(modelPtr)
+	rs = unsafe.Slice((*float32)(unsafe.Pointer(f.CsmGetPartOpacities(modelPtr))), count)
+	return
+}
+
 // GetPartIds returns the part IDs
 func GetPartIds(f *Funcs, modelPtr uintptr) (ids []string) {
 	count := f.CsmGetPartCount(modelPtr)

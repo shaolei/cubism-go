@@ -8,8 +8,10 @@ import (
 	"github.com/shaolei/cubism-go/internal/core/drawable"
 	"github.com/shaolei/cubism-go/internal/core/moc"
 	"github.com/shaolei/cubism-go/internal/core/parameter"
+	"github.com/shaolei/cubism-go/internal/expression"
 	"github.com/shaolei/cubism-go/internal/model"
 	"github.com/shaolei/cubism-go/internal/motion"
+	"github.com/shaolei/cubism-go/internal/pose"
 )
 
 // A model struct
@@ -17,7 +19,9 @@ type Model struct {
 	// Internally required
 	motionManager *motion.MotionManager
 	loopMotions   []int
-	blinkManager  *blink.BlinkManager
+	blinkManager     *blink.BlinkManager
+	poseManager      *pose.PoseManager
+	expressionManager *expression.ExpressionManager
 	// Read-only via getters
 	version       int
 	core          core.Core
@@ -116,6 +120,15 @@ func (m *Model) GetMotionGroupNames() (names []string) {
 	return
 }
 
+// Get the list of motion group names
+func (m *Model) GetMotionGroups() []string {
+	groups := make([]string, 0, len(m.motions))
+	for name := range m.motions {
+		groups = append(groups, name)
+	}
+	return groups
+}
+
 // Get the list of motions in the group
 func (m *Model) GetMotions(groupName string) []motion.Motion {
 	return m.motions[groupName]
@@ -134,7 +147,11 @@ func (m *Model) PlayMotion(groupName string, index int, loop bool) (id int) {
 			m.motionManager.Close(id)
 		})
 	}
-	id = m.motionManager.Start(m.motions[groupName][index])
+	group := m.motions[groupName]
+	if len(group) == 0 || index < 0 || index >= len(group) {
+		return -1
+	}
+	id = m.motionManager.Start(group[index])
 	if loop {
 		m.loopMotions = append(m.loopMotions, id)
 	}
@@ -167,15 +184,54 @@ func (m *Model) DisableAutoBlink() {
 	m.blinkManager = nil
 }
 
+// Play an expression by name
+func (m *Model) PlayExpression(name string) {
+	if m.expressionManager == nil {
+		m.expressionManager = expression.NewExpressionManager(m.exps)
+	}
+	m.expressionManager.PlayExpression(name)
+}
+
+// Stop the current expression
+func (m *Model) StopExpression() {
+	if m.expressionManager != nil {
+		m.expressionManager.StopExpression()
+	}
+}
+
+// Get the name of the currently playing expression
+func (m *Model) GetCurrentExpression() string {
+	if m.expressionManager == nil {
+		return ""
+	}
+	return m.expressionManager.GetCurrentExpression()
+}
+
+// Get the list of available expression names
+func (m *Model) GetExpressionNames() []string {
+	if m.expressionManager == nil {
+		m.expressionManager = expression.NewExpressionManager(m.exps)
+	}
+	return m.expressionManager.GetExpressionNames()
+}
+
 // Update the model
 func (m *Model) Update(delta float64) {
 	if m.motionManager != nil {
 		m.motionManager.Update(delta)
 	}
+	if m.expressionManager != nil {
+		m.expressionManager.Update(m.core, m.moc.ModelPtr, delta)
+	}
 	if m.blinkManager != nil {
 		m.blinkManager.Update(delta)
 	}
 	m.core.Update(m.moc.ModelPtr)
+
+	// Apply pose after model update to set correct part opacities
+	if m.poseManager != nil {
+		m.poseManager.Update(m.core, m.moc.ModelPtr, delta)
+	}
 
 	// Get the updated dynamic flags
 	dfs := m.core.GetDynamicFlags(m.moc.ModelPtr)

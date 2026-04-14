@@ -61,6 +61,10 @@ func (c *Core) GetPartIds(modelPtr uintptr) []string {
 	return base.GetPartIds(&c.funcs, modelPtr)
 }
 
+func (c *Core) GetPartOpacities(modelPtr uintptr) []float32 {
+	return base.GetPartOpacities(&c.funcs, modelPtr)
+}
+
 func (c *Core) SetPartOpacity(modelPtr uintptr, id string, value float32) {
 	base.SetPartOpacity(&c.funcs, modelPtr, id, value)
 }

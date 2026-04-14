@@ -31,6 +31,7 @@ func (m *mockCore) GetDrawables(_ uintptr) []drawable.Drawable    { return nil }
 func (m *mockCore) GetParameters(_ uintptr) []parameter.Parameter { return nil }
 func (m *mockCore) GetParameterValue(_ uintptr, _ string) float32 { return 0 }
 func (m *mockCore) GetPartIds(_ uintptr) []string                 { return nil }
+func (m *mockCore) GetPartOpacities(_ uintptr) []float32          { return nil }
 func (m *mockCore) SetPartOpacity(_ uintptr, _ string, _ float32) {}
 func (m *mockCore) GetSortedDrawableIndices(_ uintptr) []int      { return nil }
 func (m *mockCore) GetCanvasInfo(_ uintptr) (drawable.Vector2, drawable.Vector2, float32) {

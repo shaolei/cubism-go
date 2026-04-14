@@ -24,6 +24,7 @@ type Core interface {
 	GetParameterValue(uintptr, string) float32
 	SetParameterValue(uintptr, string, float32)
 	GetPartIds(uintptr) []string
+	GetPartOpacities(uintptr) []float32
 	SetPartOpacity(uintptr, string, float32)
 	GetSortedDrawableIndices(uintptr) []int
 	GetCanvasInfo(uintptr) (drawable.Vector2, drawable.Vector2, float32)

@@ -51,6 +51,7 @@ func (m *mockCore) SetParameterValue(_ uintptr, id string, value float32) {
 	m.params[id] = value
 }
 func (m *mockCore) GetPartIds(_ uintptr) []string { return nil }
+func (m *mockCore) GetPartOpacities(_ uintptr) []float32 { return nil }
 func (m *mockCore) SetPartOpacity(_ uintptr, id string, value float32) {
 	m.mu.Lock()
 	defer m.mu.Unlock()

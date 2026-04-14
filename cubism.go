@@ -8,6 +8,7 @@ import (
 	"github.com/shaolei/cubism-go/internal/core"
 	"github.com/shaolei/cubism-go/internal/model"
 	"github.com/shaolei/cubism-go/internal/motion"
+	"github.com/shaolei/cubism-go/internal/pose"
 	"github.com/shaolei/cubism-go/sound"
 	"github.com/shaolei/cubism-go/sound/disabled"
 )
@@ -115,6 +116,8 @@ func (c *Cubism) LoadModel(path string) (m *Model, err error) {
 		if err = json.Unmarshal(buf, &m.pose); err != nil {
 			return
 		}
+		// Initialize the pose manager
+		m.poseManager = pose.NewPoseManager(m.pose, c.core, m.moc.ModelPtr)
 	}
 
 	// Load the display info settings if they exist
@@ -169,7 +172,9 @@ func (c *Cubism) LoadModel(path string) (m *Model, err error) {
 					motion.LoadedSound, err = c.LoadSound(soundPath)
 				}
 				if err != nil {
-					return
+					// Sound loading failed (e.g., unsupported format) — use disabled sound instead of failing the entire model load
+					motion.LoadedSound, _ = disabled.LoadSound(soundPath)
+					err = nil
 				}
 			}
 			m.motions[name] = append(m.motions[name], motion)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"image/color"
 	"log"
@@ -14,15 +15,15 @@ import (
 )
 
 const (
-	Name   = "Haru"
 	Width  = 2880
 	Height = 1800
 )
 
 type Game struct {
-	ow, oh   int
-	tapId    int
-	renderer *renderer.Renderer
+	ow, oh      int
+	tapId       int
+	renderer    *renderer.Renderer
+	expressions []string
 }
 
 func (g *Game) Update() (err error) {
@@ -54,6 +55,21 @@ func (g *Game) Update() (err error) {
 	} else if ebiten.CursorShape() == ebiten.CursorShapePointer {
 		ebiten.SetCursorShape(ebiten.CursorShapeDefault)
 	}
+	// Expression switching with number keys (1-9 = expression index, 0 = stop)
+	keys := []ebiten.Key{ebiten.Key0, ebiten.Key1, ebiten.Key2, ebiten.Key3, ebiten.Key4, ebiten.Key5, ebiten.Key6, ebiten.Key7, ebiten.Key8, ebiten.Key9}
+	for i, key := range keys {
+		if inpututil.IsKeyJustPressed(key) {
+			m := g.renderer.GetModel()
+			if i == 0 {
+				m.StopExpression()
+				fmt.Println("Expression stopped")
+			} else if i <= len(g.expressions) {
+				name := g.expressions[i-1]
+				m.PlayExpression(name)
+				fmt.Printf("Playing expression [%d]: %s\n", i, name)
+			}
+		}
+	}
 	return
 }
 
@@ -69,24 +85,60 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	csm, err := cubism.NewCubism("Live2DCubismCore.dll")
+	modelPath := flag.String("model", "Resources/Haru/Haru.model3.json", "path to .model3.json file")
+	libPath := flag.String("lib", "Live2DCubismCore.dll", "path to Cubism Core library")
+	flag.Parse()
+
+	fmt.Printf("Loading model: %s\n", *modelPath)
+	csm, err := cubism.NewCubism(*libPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Set function for playing sound
 	csm.LoadSound = normal.LoadSound
-	model, err := csm.LoadModel(fmt.Sprintf("Resources/%s/%s.model3.json", Name, Name))
+	model, err := csm.LoadModel(*modelPath)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Play idle motion
-	model.PlayMotion("Idle", 0, true)
+	fmt.Printf("Model loaded successfully. Drawables: %d, Parameters: %d\n", len(model.GetDrawables()), len(model.GetParameters()))
+	// Set parameters for model-specific features
+	model.SetParameterValue("ParamMouseLeftDown", 1.0) // 显示左手
+	model.SetParameterValue("Param7", 1.0)             // 切换河原木桃香发型
+	// Play idle motion (if available)
+	motions := model.GetMotionGroups()
+	if len(motions) > 0 {
+		// Try "Idle" first, then fall back to the first available group
+		groupName := ""
+		for _, g := range motions {
+			if g == "Idle" {
+				groupName = g
+				break
+			}
+		}
+		if groupName == "" {
+			groupName = motions[0]
+		}
+		model.PlayMotion(groupName, 0, true)
+		fmt.Printf("Playing motion group: %s\n", groupName)
+	} else {
+		fmt.Println("No motions available for this model")
+	}
+	model.EnableAutoBlink()
+	// Print available expressions and play the first one
+	expressions := model.GetExpressionNames()
+	fmt.Printf("Available expressions (%d): %v\n", len(expressions), expressions)
+	if len(expressions) > 0 {
+		model.PlayExpression(expressions[0])
+		fmt.Printf("Playing expression: %s\n", expressions[0])
+	}
 	renderer, err := renderer.NewRenderer(model)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Renderer created, starting game loop...")
 	g := &Game{
-		renderer: renderer,
+		renderer:    renderer,
+		expressions: expressions,
 	}
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	if err := ebiten.RunGame(g); err != nil {
