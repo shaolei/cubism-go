@@ -1,0 +1,29 @@
+name: cubism-go
+type: module
+description: "Go bindings for Live2D Cubism SDK — loads, animates, and renders Live2D models without CGO"
+mapping:
+  paths:
+    - cubism.go
+    - model.go
+    - drawable.go
+aspects:
+  - aspect: version-routing
+    anchors: [NewCubism, LoadModel]
+  - aspect: dll-loading
+    anchors: [NewCubism]
+relations:
+  - target: core
+    type: calls
+    consumes: [NewCore, Core]
+  - target: model-json
+    type: calls
+    consumes: [ModelJson, ExpJson, MotionJson]
+  - target: motion
+    type: calls
+    consumes: [Motion, MotionManager]
+  - target: blink
+    type: calls
+    consumes: [BlinkManager]
+  - target: sound
+    type: calls
+    consumes: [Sound]

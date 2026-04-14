@@ -1,0 +1,16 @@
+name: Core Base
+type: service
+description: "Shared FFI function registration and high-level data extraction for all Cubism Core versions"
+mapping:
+  paths:
+    - internal/core/base/
+aspects:
+  - aspect: purego-ffi
+    anchors: [RegisterCommonFuncs, LoadMoc, GetDrawables, GetParameters, GetSortedDrawableIndices]
+relations:
+  - target: core/data-types
+    type: uses
+    consumes: [ConstantFlag, DynamicFlag, Vector2, Drawable, Parameter]
+  - target: utils
+    type: uses
+    consumes: [ParseVersion]

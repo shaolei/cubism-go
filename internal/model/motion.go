@@ -1,6 +1,6 @@
 package model
 
-import "github.com/aethiopicuschan/cubism-go/internal/motion"
+import "github.com/shaolei/cubism-go/internal/motion"
 
 type Meta struct {
 	Duration             float64 `json:"Duration"`

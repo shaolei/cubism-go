@@ -1,6 +1,6 @@
 package cubism
 
-import "github.com/aethiopicuschan/cubism-go/internal/core/drawable"
+import "github.com/shaolei/cubism-go/internal/core/drawable"
 
 type Drawable struct {
 	Id              string

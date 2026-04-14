@@ -1,0 +1,3 @@
+name: Version Routing
+description: "Core implementation is selected at runtime based on the Cubism SDK major version parsed from the native DLL"
+stability: protocol

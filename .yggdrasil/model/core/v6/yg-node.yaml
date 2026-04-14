@@ -1,0 +1,15 @@
+name: Core v6
+type: service
+description: "Cubism Core v6.x implementation using csmGetDrawableDrawOrders"
+mapping:
+  paths:
+    - internal/core/core_6_0_1/
+aspects:
+  - aspect: version-routing
+    anchors: [NewCore]
+  - aspect: purego-ffi
+    anchors: [RegisterCommonFuncs]
+relations:
+  - target: core/base
+    type: uses
+    consumes: [Funcs, RegisterCommonFuncs, LoadMoc, GetVersion, GetDynamicFlags, GetOpacities, GetVertexPositions, GetDrawables, GetParameters, GetParameterValue, SetParameterValue, GetPartIds, SetPartOpacity, GetSortedDrawableIndices, GetCanvasInfo, Update]

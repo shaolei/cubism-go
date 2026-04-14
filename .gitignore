@@ -1,3 +1,36 @@
+# OS files
 .DS_Store
-example/Resources/*
-example/*.dylib
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# AI tool cache
+.codebuddy/
+
+# Build output
+*.exe
+*.exe~
+*.dll
+*.dylib
+*.so
+
+# Test coverage
+coverage.out
+cover.out
+cover/
+coverage/
+
+# Go workspace
+vendor/
+
+# Example resources (large binary files)
+example/Resources/
+
+# Binary temp files in project root
+cover
+coverage

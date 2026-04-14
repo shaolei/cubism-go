@@ -1,0 +1,39 @@
+{
+  "hash": "b67f81bd83e9f64722bf60eb1efe87c894160163754a5a0e34fb3c021a04f18c",
+  "files": {
+    ".yggdrasil/model/motion/yg-node.yaml": "7d6212f9820f3ebc5fcdf7046628faf5125c67d0523af9f4f37f6e40cb2c9ab8",
+    ".yggdrasil/model/motion/interface.md": "2711831ba7e2f5c995681cdd0bac5e4b031859ab07ada7e4cfb7d162cc001c2f",
+    ".yggdrasil/model/motion/internals.md": "5a68c7ce189f000c3f87b0c941a012fcba90fed6201f62ac3756dbccc7e88a26",
+    ".yggdrasil/model/motion/responsibility.md": "c4679be4bbb62149b2a11129081f2dfea66de36e763e0b543da0d2c07da05de3",
+    ".yggdrasil/model/core/responsibility.md": "4658b078e9dbf5d65a6bd7d2420b549fd87f659a5a57baf500dc3e0a901bbf2e",
+    ".yggdrasil/model/core/interface.md": "2dc54005129cf3455f090327c8a4913bbb5fb4907c0a34b68932e27cde61af2b",
+    ".yggdrasil/model/sound/responsibility.md": "0a90233c0107bf74e28e62f951c3b0ab23a3f8a2528e95ce4718762c767c18f7",
+    ".yggdrasil/model/sound/interface.md": "a939a54bf5e5f9aefb5217f79627e6e6999c2b5f1116fe1a5fc82b19a0528344",
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": "5e0f41ecb46a74c8b7aae7e1a35d99ad6ea1afd7af32b7d0f1d2aff89084327e",
+    ".yggdrasil/flows/live2d-model-rendering/description.md": "e38bea5a846106f8e96f9319d1f3ae6b06f973b4fb8eea76ee39d6fd99a8fe6c",
+    "internal/motion/entry.go": "0b492a8c71a4e0e8f54bcabfa878eddc402ad686226ec6a5045022a7f87f636b",
+    "internal/motion/math.go": "403a59d8f604852a850c5525940fae9763cc9fe4b26341c621381054ebf689f2",
+    "internal/motion/math_test.go": "068ad0f6289347a03cd3ef6e657df2228293637c6d1601679d5bc6b9745b9500",
+    "internal/motion/motion.go": "0b89d89a938fed7351d811fc6e026f55314250d1990096143626ee7acc942a9e",
+    "internal/motion/motion_manager.go": "9a095b6be15a883651e7586d2944558510460423c8187c972c3276db53c8fcaf",
+    "internal/motion/motion_manager_test.go": "943ee3a558f285fb13650989fcac83d471c8f2747d7fe6c9646a05b6ea9e40ee"
+  },
+  "mtimes": {
+    ".yggdrasil/model/motion/yg-node.yaml": 1776141373397.2004,
+    ".yggdrasil/model/motion/interface.md": 1776141389050.5093,
+    ".yggdrasil/model/motion/internals.md": 1776141400943.702,
+    ".yggdrasil/model/motion/responsibility.md": 1776141380664.5117,
+    ".yggdrasil/model/core/responsibility.md": 1776141305607.0828,
+    ".yggdrasil/model/core/interface.md": 1776141305607.0828,
+    ".yggdrasil/model/sound/responsibility.md": 1776141499384.3247,
+    ".yggdrasil/model/sound/interface.md": 1776141499392.221,
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": 1776141519508.1272,
+    ".yggdrasil/flows/live2d-model-rendering/description.md": 1776141519508.6414,
+    "internal/motion/entry.go": 1776132115480.4866,
+    "internal/motion/math.go": 1776132115480.4866,
+    "internal/motion/math_test.go": 1776140133649.8252,
+    "internal/motion/motion.go": 1776142600521.338,
+    "internal/motion/motion_manager.go": 1776142600519.7908,
+    "internal/motion/motion_manager_test.go": 1776142600518.433
+  }
+}

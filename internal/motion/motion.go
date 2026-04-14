@@ -1,6 +1,6 @@
 package motion
 
-import "github.com/aethiopicuschan/cubism-go/sound"
+import "github.com/shaolei/cubism-go/sound"
 
 const (
 	Linear = iota

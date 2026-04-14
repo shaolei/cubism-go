@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/aethiopicuschan/cubism-go/internal/core"
-	"github.com/aethiopicuschan/cubism-go/internal/model"
-	"github.com/aethiopicuschan/cubism-go/internal/motion"
-	"github.com/aethiopicuschan/cubism-go/sound"
-	"github.com/aethiopicuschan/cubism-go/sound/disabled"
+	"github.com/shaolei/cubism-go/internal/core"
+	"github.com/shaolei/cubism-go/internal/model"
+	"github.com/shaolei/cubism-go/internal/motion"
+	"github.com/shaolei/cubism-go/sound"
+	"github.com/shaolei/cubism-go/sound/disabled"
 )
 
 /*

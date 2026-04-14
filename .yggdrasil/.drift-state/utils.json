@@ -1,0 +1,21 @@
+{
+  "hash": "6d00f59761c22c1421acbbfab687818e2c37437fd4fda3bedc2a57f980ecea02",
+  "files": {
+    ".yggdrasil/model/utils/yg-node.yaml": "cf03f5dffe9496dbcba536ea06ca42ac5e10d190fd583601483cb981bd08601d",
+    ".yggdrasil/model/utils/interface.md": "22afa189dde61aeee88f539e123e738b9735e39d00cf94a86fe58bf7841681e6",
+    ".yggdrasil/model/utils/responsibility.md": "5543851420650a06ff344debb893dc7a3b2687b51ea83b362b18be42bd2c9d15",
+    "internal/utils/version.go": "bda0f67dbc4c358084778cb2d1dd5a42b95b458e8daf8a5280cc32a7583d3cb5",
+    "internal/utils/version_test.go": "733be53cb5c3d17adda2dd0466d1c05019b1f139a5e71df2cfad38c25bc799ef",
+    "internal/strings/strings.go": "afbaf67fd4fad4a547d57ad00cd6943065615484184a04c1de6e5a980348e907",
+    "internal/strings/strings_test.go": "06f904b561bc034ecfd101262624f11fa67b1e13e52bcf7f3b28dffd1c181d6e"
+  },
+  "mtimes": {
+    ".yggdrasil/model/utils/yg-node.yaml": 1776141564580.4287,
+    ".yggdrasil/model/utils/interface.md": 1776141499392.221,
+    ".yggdrasil/model/utils/responsibility.md": 1776141499392.221,
+    "internal/utils/version.go": 1776135534586.054,
+    "internal/utils/version_test.go": 1776140201900.0452,
+    "internal/strings/strings.go": 1776132115482.009,
+    "internal/strings/strings_test.go": 1776142600523.035
+  }
+}

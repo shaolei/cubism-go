@@ -1,0 +1,25 @@
+{
+  "hash": "48e32b668e4a1b639b0f69a3403dfd13f236598974ffa186211a12121316d712",
+  "files": {
+    ".yggdrasil/model/blink/yg-node.yaml": "2260da31672952db48fe55ea97714fa2d31e13849ec6c037ff6625caae5a37c1",
+    ".yggdrasil/model/blink/interface.md": "6d70b5719f49dd3d0e6b6aae6a0b1fcfa6b3def85afa9346f68e45e507752239",
+    ".yggdrasil/model/blink/responsibility.md": "211ed9d12be8896d9b6439950a15feabf18f42360e3f93d7df758c3a2d3981d4",
+    ".yggdrasil/model/core/responsibility.md": "4658b078e9dbf5d65a6bd7d2420b549fd87f659a5a57baf500dc3e0a901bbf2e",
+    ".yggdrasil/model/core/interface.md": "2dc54005129cf3455f090327c8a4913bbb5fb4907c0a34b68932e27cde61af2b",
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": "5e0f41ecb46a74c8b7aae7e1a35d99ad6ea1afd7af32b7d0f1d2aff89084327e",
+    ".yggdrasil/flows/live2d-model-rendering/description.md": "e38bea5a846106f8e96f9319d1f3ae6b06f973b4fb8eea76ee39d6fd99a8fe6c",
+    "internal/blink/blink_manager.go": "20c2bbe345d46ce63a8208e402aeff087becc83476c215e8c499d74c9d65b046",
+    "internal/blink/blink_manager_test.go": "2f1298cca0a23c9c7fc94cf662ff12e05acc9a734ae3337e2c34a0b256019c30"
+  },
+  "mtimes": {
+    ".yggdrasil/model/blink/yg-node.yaml": 1776141436145.6753,
+    ".yggdrasil/model/blink/interface.md": 1776141436155.2068,
+    ".yggdrasil/model/blink/responsibility.md": 1776141436145.6753,
+    ".yggdrasil/model/core/responsibility.md": 1776141305607.0828,
+    ".yggdrasil/model/core/interface.md": 1776141305607.0828,
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": 1776141519508.1272,
+    ".yggdrasil/flows/live2d-model-rendering/description.md": 1776141519508.6414,
+    "internal/blink/blink_manager.go": 1776142600487.283,
+    "internal/blink/blink_manager_test.go": 1776142600484.2122
+  }
+}

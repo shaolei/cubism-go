@@ -1,0 +1,13 @@
+name: Renderer
+type: module
+description: "Ebitengine-based Live2D model renderer with mask support and hit detection"
+mapping:
+  paths:
+    - renderer/
+relations:
+  - target: cubism-go
+    type: implements
+    consumes: [Model, Drawable]
+  - target: utils
+    type: uses
+    consumes: [Normalize]

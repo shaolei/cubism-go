@@ -1,0 +1,35 @@
+{
+  "hash": "459180d3029819333d7bfcec49c60126eb3e2daa71abc1c4952fd790bbc9a70d",
+  "files": {
+    ".yggdrasil/model/renderer/yg-node.yaml": "0d337e66435942a8ee22e4776500ef690ae0bcf98ef849f0b1588be907cff796",
+    ".yggdrasil/model/renderer/interface.md": "23bb35ac0333a3d610b7ffa4e3da4adc48fb271b5de684d180089363d24b558d",
+    ".yggdrasil/model/renderer/internals.md": "3d8aa85b325bd3c38c7718d6832b1654719fb6f45290a2ba831a087d1baf0848",
+    ".yggdrasil/model/renderer/responsibility.md": "68a0baead01a6739382dea0ade87674e2c94f8b146dff246b0ae96650fc59edd",
+    ".yggdrasil/model/cubism-go/interface.md": "bc28b724d7b84b82ee03fa224154c2a7691a975a64f9a390ba7d1d4ebd975884",
+    ".yggdrasil/model/utils/responsibility.md": "5543851420650a06ff344debb893dc7a3b2687b51ea83b362b18be42bd2c9d15",
+    ".yggdrasil/model/utils/interface.md": "22afa189dde61aeee88f539e123e738b9735e39d00cf94a86fe58bf7841681e6",
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": "5e0f41ecb46a74c8b7aae7e1a35d99ad6ea1afd7af32b7d0f1d2aff89084327e",
+    ".yggdrasil/flows/live2d-model-rendering/description.md": "e38bea5a846106f8e96f9319d1f3ae6b06f973b4fb8eea76ee39d6fd99a8fe6c",
+    "renderer/ebitengine/mask.kage": "94d765bc31f85f751d0a4657459e5d61e551450178b0fb446447a1cb759ee268",
+    "renderer/utils/normalize.go": "e519ecf80817ce18b747a29841480cbd32e675bfbe9a75d1678ec7424e3d6096",
+    ".yggdrasil/model/cubism-go/responsibility.md": "b9561202211c8ae4570af12541403479733bd2c8425d7be1f6e8f171d0830ece",
+    "renderer/ebitengine/renderer.go": "101fe6abc7557a20e61dd9fb99b0d605edea217f980c194815c93d9db5ece20c",
+    "renderer/utils/normalize_test.go": "fab92928380cb181924fc7436bfe76ce75df7ccd1c49272fbb3f9abb6272a264"
+  },
+  "mtimes": {
+    ".yggdrasil/model/renderer/yg-node.yaml": 1776141549349.5862,
+    ".yggdrasil/model/renderer/interface.md": 1776141461875.915,
+    ".yggdrasil/model/renderer/internals.md": 1776141461875.915,
+    ".yggdrasil/model/renderer/responsibility.md": 1776141461875.915,
+    ".yggdrasil/model/cubism-go/responsibility.md": 1776142620534.7297,
+    ".yggdrasil/model/cubism-go/interface.md": 1776141276231.302,
+    ".yggdrasil/model/utils/responsibility.md": 1776141499392.221,
+    ".yggdrasil/model/utils/interface.md": 1776141499392.221,
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": 1776141519508.1272,
+    ".yggdrasil/flows/live2d-model-rendering/description.md": 1776141519508.6414,
+    "renderer/ebitengine/mask.kage": 1776132115482.009,
+    "renderer/ebitengine/renderer.go": 1776142600529.703,
+    "renderer/utils/normalize.go": 1776139534965.0383,
+    "renderer/utils/normalize_test.go": 1776142600532.3257
+  }
+}

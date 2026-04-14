@@ -1,0 +1,8 @@
+name: Core Data Types
+type: library
+description: "Shared data types for Cubism Core: drawable flags, vectors, parameters, and moc"
+mapping:
+  paths:
+    - internal/core/drawable/
+    - internal/core/moc/
+    - internal/core/parameter/

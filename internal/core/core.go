@@ -2,12 +2,15 @@ package core
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
-	core_5_0_0 "github.com/aethiopicuschan/cubism-go/internal/core/core_5_0_0"
-	"github.com/aethiopicuschan/cubism-go/internal/core/drawable"
-	"github.com/aethiopicuschan/cubism-go/internal/core/minimum"
-	"github.com/aethiopicuschan/cubism-go/internal/core/moc"
-	"github.com/aethiopicuschan/cubism-go/internal/core/parameter"
+	core_5_0_0 "github.com/shaolei/cubism-go/internal/core/core_5_0_0"
+	core_6_0_1 "github.com/shaolei/cubism-go/internal/core/core_6_0_1"
+	"github.com/shaolei/cubism-go/internal/core/drawable"
+	"github.com/shaolei/cubism-go/internal/core/minimum"
+	"github.com/shaolei/cubism-go/internal/core/moc"
+	"github.com/shaolei/cubism-go/internal/core/parameter"
 )
 
 type Core interface {
@@ -37,10 +40,30 @@ func NewCore(lib string) (c Core, err error) {
 		return
 	}
 	version := mc.GetVersion()
-	if version == "5.0.0" {
-		c, err = core_5_0_0.NewCore(l)
+
+	// Parse major version to determine which core implementation to use
+	major, err := parseMajorVersion(version)
+	if err != nil {
+		err = fmt.Errorf("failed to parse version %s: %w", version, err)
 		return
 	}
-	err = fmt.Errorf("unsupported version: %s", version)
+
+	switch major {
+	case 5:
+		c, err = core_5_0_0.NewCore(l)
+	case 6:
+		c, err = core_6_0_1.NewCore(l)
+	default:
+		err = fmt.Errorf("unsupported version: %s (major: %d)", version, major)
+	}
 	return
+}
+
+// parseMajorVersion extracts the major version number from a version string like "5.0.0" or "6.0.1"
+func parseMajorVersion(version string) (int, error) {
+	parts := strings.SplitN(version, ".", 2)
+	if len(parts) == 0 {
+		return 0, fmt.Errorf("invalid version format")
+	}
+	return strconv.Atoi(parts[0])
 }

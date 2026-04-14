@@ -1,0 +1,6 @@
+name: Sound
+type: module
+description: "Audio playback system with normal, delayed, and disabled strategies using beep/oto"
+mapping:
+  paths:
+    - sound/

@@ -1,0 +1,39 @@
+{
+  "hash": "7559e92b24c57252783c234a73eee1dac26d18f29a847fb13cd12ce8cb3f043e",
+  "files": {
+    ".yggdrasil/model/model-json/yg-node.yaml": "7ec23c2d48479a09208fafeddae842fb87f6ca2964fa3a91cb5a975de2980d13",
+    ".yggdrasil/model/model-json/interface.md": "7db2c03b862fdc697cfecd01b8189ca0a4f49bcbf2cfbe3c09e835555807227d",
+    ".yggdrasil/model/model-json/internals.md": "33f41306816cf0c60346a05abee3fcaaaee2b02516a55a262c51491da142bbb8",
+    ".yggdrasil/model/model-json/responsibility.md": "377606bc971a057fdec7af19ac8237225702073ee6205447988c5335fd90da7a",
+    ".yggdrasil/model/motion/responsibility.md": "c4679be4bbb62149b2a11129081f2dfea66de36e763e0b543da0d2c07da05de3",
+    ".yggdrasil/model/motion/interface.md": "2711831ba7e2f5c995681cdd0bac5e4b031859ab07ada7e4cfb7d162cc001c2f",
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": "5e0f41ecb46a74c8b7aae7e1a35d99ad6ea1afd7af32b7d0f1d2aff89084327e",
+    ".yggdrasil/flows/live2d-model-rendering/description.md": "e38bea5a846106f8e96f9319d1f3ae6b06f973b4fb8eea76ee39d6fd99a8fe6c",
+    "internal/model/cdi.go": "f93256703a33dd2300aaca5686ed0803d9d6dfbf2367086944b9fe350aac099c",
+    "internal/model/exp.go": "a443834fa3ba6e894a5078485f08fb76199d850194cb2b1a3665ac66611d1879",
+    "internal/model/model.go": "2c2c449f5bbb2829c11262002c671565a65d462b7652eddeb5ff6e82f79faab6",
+    "internal/model/model_test.go": "faa1e290efd125445bef93d0e23d7c4e15fe34efd168194186c19d1bcb7fbf74",
+    "internal/model/physics.go": "08e1d248cc24ab3114deae8aab58951c2fa6cc4b1a461e9cf1f363378f9d68e1",
+    "internal/model/pose.go": "5720f3c30090681530882eb8561975a229d3e545e9e663ae3370a898539a29c4",
+    "internal/model/userdata.go": "a14744b1af4fd418a703c263ef5ba755f03f330275bd8d5c161a983e0553454b",
+    "internal/model/motion.go": "099a07646cd82a3e2f1ec7d3dace3ad7f3f977fa90a55f8ee0fa533dc5191e8e"
+  },
+  "mtimes": {
+    ".yggdrasil/model/model-json/yg-node.yaml": 1776141436155.2068,
+    ".yggdrasil/model/model-json/interface.md": 1776141588536.205,
+    ".yggdrasil/model/model-json/internals.md": 1776141436155.2068,
+    ".yggdrasil/model/model-json/responsibility.md": 1776141436145.6753,
+    ".yggdrasil/model/motion/responsibility.md": 1776141380664.5117,
+    ".yggdrasil/model/motion/interface.md": 1776141389050.5093,
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": 1776141519508.1272,
+    ".yggdrasil/flows/live2d-model-rendering/description.md": 1776141519508.6414,
+    "internal/model/cdi.go": 1776132115480.4866,
+    "internal/model/exp.go": 1776132115480.4866,
+    "internal/model/model.go": 1776132115480.4866,
+    "internal/model/model_test.go": 1776140133667.5422,
+    "internal/model/motion.go": 1776142600512.6492,
+    "internal/model/physics.go": 1776132115480.4866,
+    "internal/model/pose.go": 1776132115480.4866,
+    "internal/model/userdata.go": 1776132115480.4866
+  }
+}

@@ -1,0 +1,12 @@
+name: Live2D Model Rendering
+description: "End-to-end process of loading, animating, and rendering a Live2D Cubism model"
+nodes:
+  - cubism-go
+  - core
+  - core/base
+  - core/data-types
+  - motion
+  - blink
+  - model-json
+  - renderer
+  - sound

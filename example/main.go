@@ -5,9 +5,9 @@ import (
 	"image/color"
 	"log"
 
-	"github.com/aethiopicuschan/cubism-go"
-	renderer "github.com/aethiopicuschan/cubism-go/renderer/ebitengine"
-	"github.com/aethiopicuschan/cubism-go/sound/normal"
+	"github.com/shaolei/cubism-go"
+	renderer "github.com/shaolei/cubism-go/renderer/ebitengine"
+	"github.com/shaolei/cubism-go/sound/normal"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -69,7 +69,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	csm, err := cubism.NewCubism("libLive2DCubismCore.dylib")
+	csm, err := cubism.NewCubism("Live2DCubismCore.dll")
 	if err != nil {
 		log.Fatal(err)
 	}

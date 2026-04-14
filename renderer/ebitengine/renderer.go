@@ -6,8 +6,8 @@ import (
 	"image/color"
 	_ "image/png"
 
-	"github.com/aethiopicuschan/cubism-go"
-	"github.com/aethiopicuschan/cubism-go/renderer/utils"
+	"github.com/shaolei/cubism-go"
+	"github.com/shaolei/cubism-go/renderer/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/colorm"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -214,13 +214,17 @@ func (r *Renderer) IsHit(x, y int, id string) (hit bool, err error) {
 		return
 	}
 
-	// Rectangular range
+	// Rectangular range: initialize from the first vertex
 	var left, right, top, bottom float32
-	left = float32(r.surface.Bounds().Dx())
-	top = float32(r.surface.Bounds().Dy())
+	if len(d.VertexPositions) > 0 {
+		left = d.VertexPositions[0].X
+		right = d.VertexPositions[0].X
+		top = d.VertexPositions[0].Y
+		bottom = d.VertexPositions[0].Y
+	}
 
 	// Get the rectangle representing the range of the Drawable
-	for i := 0; i < len(d.VertexPositions); i++ {
+	for i := 1; i < len(d.VertexPositions); i++ {
 		v := d.VertexPositions[i]
 		if v.X < left {
 			left = v.X

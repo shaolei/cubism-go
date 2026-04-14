@@ -1,0 +1,13 @@
+name: Motion
+type: module
+description: "Motion playback engine: curve interpolation, fade blending, and queue management for Live2D animations"
+mapping:
+  paths:
+    - internal/motion/
+relations:
+  - target: core
+    type: calls
+    consumes: [Core]
+  - target: sound
+    type: uses
+    consumes: [Sound]

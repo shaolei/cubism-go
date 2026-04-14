@@ -3,13 +3,13 @@ package cubism
 import (
 	"fmt"
 
-	"github.com/aethiopicuschan/cubism-go/internal/blink"
-	"github.com/aethiopicuschan/cubism-go/internal/core"
-	"github.com/aethiopicuschan/cubism-go/internal/core/drawable"
-	"github.com/aethiopicuschan/cubism-go/internal/core/moc"
-	"github.com/aethiopicuschan/cubism-go/internal/core/parameter"
-	"github.com/aethiopicuschan/cubism-go/internal/model"
-	"github.com/aethiopicuschan/cubism-go/internal/motion"
+	"github.com/shaolei/cubism-go/internal/blink"
+	"github.com/shaolei/cubism-go/internal/core"
+	"github.com/shaolei/cubism-go/internal/core/drawable"
+	"github.com/shaolei/cubism-go/internal/core/moc"
+	"github.com/shaolei/cubism-go/internal/core/parameter"
+	"github.com/shaolei/cubism-go/internal/model"
+	"github.com/shaolei/cubism-go/internal/motion"
 )
 
 // A model struct
@@ -85,6 +85,12 @@ func (m *Model) GetDrawable(id string) (d Drawable, err error) {
 // Get the list of hit areas
 func (m *Model) GetHitAreas() []model.HitArea {
 	return m.hitAreas
+}
+
+// Close releases the resources held by the Model.
+// After calling Close, the Model must not be used anymore.
+func (m *Model) Close() {
+	m.moc.Close()
 }
 
 // Get the list of parameters

@@ -1,0 +1,25 @@
+name: Core Router
+type: service
+description: "Routes to the correct Cubism Core implementation based on runtime version detection"
+mapping:
+  paths:
+    - internal/core/core.go
+    - internal/core/open_windows.go
+    - internal/core/open_unix.go
+aspects:
+  - aspect: version-routing
+    anchors: [NewCore, parseMajorVersion]
+  - aspect: dll-loading
+    anchors: [openLibrary, CloseLibrary]
+  - aspect: purego-ffi
+    anchors: [NewCore]
+relations:
+  - target: core/minimum
+    type: calls
+    consumes: [NewCore, GetVersion]
+  - target: core/v5
+    type: calls
+    consumes: [NewCore]
+  - target: core/v6
+    type: calls
+    consumes: [NewCore]

@@ -1,0 +1,41 @@
+{
+  "hash": "dfd66a7ab0890f5fdfcf72e3aa42b8f8a27271b7c42a4dc8b1117ce1276bec7a",
+  "files": {
+    ".yggdrasil/model/core/v6/yg-node.yaml": "32763689a33aa849617b3b02973b52563cba7db2d5d5c7d0d13c80609a4815b1",
+    ".yggdrasil/model/core/v6/interface.md": "3dfbe68d93019f0fa190a1d6e2ca1c503af10c75cd08e451770501ee17559a6d",
+    ".yggdrasil/model/core/v6/responsibility.md": "dec926510fce359d4edc7d3ab55b26598b16d08d95fdacc1f8586f5a12e8818f",
+    ".yggdrasil/model/core/yg-node.yaml": "36e8a3c12f0fc13e5906355f63d901ca972d17f49aca059e5cc4b24eef3595af",
+    ".yggdrasil/model/core/interface.md": "2dc54005129cf3455f090327c8a4913bbb5fb4907c0a34b68932e27cde61af2b",
+    ".yggdrasil/model/core/responsibility.md": "4658b078e9dbf5d65a6bd7d2420b549fd87f659a5a57baf500dc3e0a901bbf2e",
+    ".yggdrasil/aspects/version-routing/yg-aspect.yaml": "c2f8302748994cb51099fee5ddcf76c12f9bc26b5d00d4ef6db80aed1060e0c2",
+    ".yggdrasil/aspects/version-routing/rules.md": "5ff37f43b8c415879e1d041a4cc17668bcbc32d7185456e4dce729b1a4a623fe",
+    ".yggdrasil/aspects/purego-ffi/yg-aspect.yaml": "85d3ef4e6ba05c26fa815f1a8cca5bd08bfbad7e30ea35cfef1d5f425be011a6",
+    ".yggdrasil/aspects/purego-ffi/rules.md": "1ff292d6cad2e97bfbce60fb4575a418156a50c3c67c37dd2eb2ec21adedec36",
+    ".yggdrasil/aspects/dll-loading/yg-aspect.yaml": "be3931c5d163812e17365140e8b3645172317ea29a68c4a937cb5d7dfca2f19a",
+    ".yggdrasil/aspects/dll-loading/rules.md": "c6365c97c1ce5cd67fbe7e7604408193115480d3e146e2871646e20b19477990",
+    ".yggdrasil/model/core/base/responsibility.md": "4fe0997c1da0a0fb9787e26b290eeee71ea4c154eb0e096128aea6d800676f17",
+    ".yggdrasil/model/core/base/interface.md": "bd6a833874b85375c023dd010633d8988320a0c9b1492981c189b173a778cbc3",
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": "5e0f41ecb46a74c8b7aae7e1a35d99ad6ea1afd7af32b7d0f1d2aff89084327e",
+    ".yggdrasil/flows/live2d-model-rendering/description.md": "e38bea5a846106f8e96f9319d1f3ae6b06f973b4fb8eea76ee39d6fd99a8fe6c",
+    "internal/core/core_6_0_1/core.go": "fc2baf4b5f3bd69ac8cc212e8726cf4295ca066e42d518cad128e7c8cc59d112"
+  },
+  "mtimes": {
+    ".yggdrasil/model/core/v6/yg-node.yaml": 1776141347061.518,
+    ".yggdrasil/model/core/v6/interface.md": 1776141588532.1409,
+    ".yggdrasil/model/core/v6/responsibility.md": 1776141347059.9539,
+    ".yggdrasil/model/core/yg-node.yaml": 1776141305607.0828,
+    ".yggdrasil/model/core/interface.md": 1776141305607.0828,
+    ".yggdrasil/model/core/responsibility.md": 1776141305607.0828,
+    ".yggdrasil/aspects/version-routing/yg-aspect.yaml": 1776141235649.3215,
+    ".yggdrasil/aspects/version-routing/rules.md": 1776141235649.3215,
+    ".yggdrasil/aspects/purego-ffi/yg-aspect.yaml": 1776141235649.3215,
+    ".yggdrasil/aspects/purego-ffi/rules.md": 1776141235650.9084,
+    ".yggdrasil/aspects/dll-loading/yg-aspect.yaml": 1776141235647.748,
+    ".yggdrasil/aspects/dll-loading/rules.md": 1776141235649.3215,
+    ".yggdrasil/model/core/base/responsibility.md": 1776141347059.9539,
+    ".yggdrasil/model/core/base/interface.md": 1776141588536.205,
+    ".yggdrasil/flows/live2d-model-rendering/yg-flow.yaml": 1776141519508.1272,
+    ".yggdrasil/flows/live2d-model-rendering/description.md": 1776141519508.6414,
+    "internal/core/core_6_0_1/core.go": 1776142600497.0164
+  }
+}

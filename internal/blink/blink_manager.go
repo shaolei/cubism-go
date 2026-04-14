@@ -3,7 +3,7 @@ package blink
 import (
 	"math/rand"
 
-	"github.com/aethiopicuschan/cubism-go/internal/core"
+	"github.com/shaolei/cubism-go/internal/core"
 )
 
 const (

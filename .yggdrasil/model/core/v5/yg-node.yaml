@@ -1,0 +1,15 @@
+name: Core v5
+type: service
+description: "Cubism Core v5.x implementation using csmGetDrawableRenderOrders"
+mapping:
+  paths:
+    - internal/core/core_5_0_0/
+aspects:
+  - aspect: version-routing
+    anchors: [NewCore]
+  - aspect: purego-ffi
+    anchors: [RegisterCommonFuncs]
+relations:
+  - target: core/base
+    type: uses
+    consumes: [Funcs, RegisterCommonFuncs, LoadMoc, GetVersion, GetDynamicFlags, GetOpacities, GetVertexPositions, GetDrawables, GetParameters, GetParameterValue, SetParameterValue, GetPartIds, SetPartOpacity, GetSortedDrawableIndices, GetCanvasInfo, Update]

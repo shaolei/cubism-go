@@ -1,0 +1,7 @@
+name: Utils
+type: library
+description: "Shared utility functions: version parsing, C string conversion, coordinate normalization"
+mapping:
+  paths:
+    - internal/utils/
+    - internal/strings/

@@ -1,7 +1,7 @@
 package motion
 
 import (
-	"github.com/aethiopicuschan/cubism-go/internal/core"
+	"github.com/shaolei/cubism-go/internal/core"
 )
 
 type MotionManager struct {

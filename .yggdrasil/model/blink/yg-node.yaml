@@ -1,0 +1,10 @@
+name: Blink
+type: module
+description: "Auto-blink state machine that periodically closes and opens eye parameters"
+mapping:
+  paths:
+    - internal/blink/
+relations:
+  - target: core
+    type: calls
+    consumes: [Core]

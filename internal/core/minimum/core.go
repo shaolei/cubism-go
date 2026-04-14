@@ -1,7 +1,7 @@
 package minimum
 
 import (
-	"github.com/aethiopicuschan/cubism-go/internal/utils"
+	"github.com/shaolei/cubism-go/internal/utils"
 	"github.com/ebitengine/purego"
 )
 

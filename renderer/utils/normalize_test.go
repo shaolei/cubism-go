@@ -3,11 +3,12 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/aethiopicuschan/cubism-go/renderer/utils"
-	"github.com/stretchr/testify/assert"
+	"github.com/shaolei/cubism-go/renderer/utils"
 )
 
 func TestNormalize(t *testing.T) {
+	t.Parallel()
+
 	testcases := []struct {
 		name   string
 		x      float32
@@ -15,34 +16,26 @@ func TestNormalize(t *testing.T) {
 		m      float32
 		expect float32
 	}{
-		{
-			name:   "center",
-			x:      5,
-			n:      0,
-			m:      10,
-			expect: 0,
-		},
-		{
-			name:   "min",
-			x:      0,
-			n:      0,
-			m:      10,
-			expect: -1,
-		},
-		{
-			name:   "max",
-			x:      10,
-			n:      0,
-			m:      10,
-			expect: 1,
-		},
+		{"center", 5, 0, 10, 0},
+		{"min", 0, 0, 10, -1},
+		{"max", 10, 0, 10, 1},
+		{"below range", -5, 0, 10, -2},
+		{"above range", 15, 0, 10, 2},
+		{"quarter", 2.5, 0, 10, -0.5},
+		{"three quarters", 7.5, 0, 10, 0.5},
+		{"same n and m returns zero", 5, 3, 3, 0},
+		{"same n and m with x equals n", 3, 3, 3, 0},
+		{"negative range", 0, -10, 10, 0},
+		{"small range", 0.5, 0, 1, 0},
 	}
 
-	for _, testcase := range testcases {
-		t.Run(testcase.name, func(t *testing.T) {
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			got := utils.Normalize(testcase.x, testcase.n, testcase.m)
-			assert.Equal(t, testcase.expect, got)
+			got := utils.Normalize(tc.x, tc.n, tc.m)
+			if got != tc.expect {
+				t.Errorf("Normalize(%v, %v, %v) = %v, want %v", tc.x, tc.n, tc.m, got, tc.expect)
+			}
 		})
 	}
 }

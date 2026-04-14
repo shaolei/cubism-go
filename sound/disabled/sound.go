@@ -1,6 +1,6 @@
 package disabled
 
-import "github.com/aethiopicuschan/cubism-go/sound"
+import "github.com/shaolei/cubism-go/sound"
 
 type Sound struct {
 	fp string

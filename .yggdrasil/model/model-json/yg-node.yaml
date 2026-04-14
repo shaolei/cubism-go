@@ -1,0 +1,10 @@
+name: Model JSON
+type: library
+description: "JSON struct definitions for all Live2D model3 configuration files and motion-to-domain conversion"
+mapping:
+  paths:
+    - internal/model/
+relations:
+  - target: motion
+    type: uses
+    consumes: [Motion, Meta, Curve, Segment, Point]

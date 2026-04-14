@@ -1,40 +1,31 @@
-package utils_test
+package utils
 
-import (
-	"testing"
-
-	"github.com/aethiopicuschan/cubism-go/internal/utils"
-	"github.com/stretchr/testify/assert"
-)
+import "testing"
 
 func TestParseVersion(t *testing.T) {
-	testcases := []struct {
+	t.Parallel()
+
+	tests := []struct {
 		name   string
 		src    uint32
 		expect string
 	}{
-		{
-			name:   "1.0.0",
-			src:    16777216,
-			expect: "1.0.0",
-		},
-		{
-			name:   "2.3.4",
-			src:    33751044,
-			expect: "2.3.4",
-		},
-		{
-			name:   "5.0.0",
-			src:    83886080,
-			expect: "5.0.0",
-		},
+		{"1.0.0", 0x01000000, "1.0.0"},
+		{"2.3.4", 0x02030004, "2.3.4"},
+		{"5.0.0", 0x05000000, "5.0.0"},
+		{"6.0.1", 0x06000001, "6.0.1"},
+		{"0.0.0", 0, "0.0.0"},
+		{"255.255.65535", 0xFFFF_FFFF, "255.255.65535"},
+		{"3.1.0", 0x03010000, "3.1.0"},
 	}
 
-	for _, testcase := range testcases {
-		t.Run(testcase.name, func(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got := utils.ParseVersion(testcase.src)
-			assert.Equal(t, testcase.expect, got)
+			got := ParseVersion(tt.src)
+			if got != tt.expect {
+				t.Errorf("ParseVersion(0x%08X) = %q, want %q", tt.src, got, tt.expect)
+			}
 		})
 	}
 }

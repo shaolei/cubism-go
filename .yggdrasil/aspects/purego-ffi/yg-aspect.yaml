@@ -1,0 +1,3 @@
+name: Purego FFI
+description: "All native Cubism Core C functions are called via purego FFI without CGO"
+stability: implementation

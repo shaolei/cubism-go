@@ -1,0 +1,13 @@
+name: Core Minimum
+type: service
+description: "Minimal Core wrapper that only queries the DLL version for routing decisions"
+mapping:
+  paths:
+    - internal/core/minimum/
+aspects:
+  - aspect: purego-ffi
+    anchors: [NewCore, GetVersion, csmGetVersion]
+relations:
+  - target: utils
+    type: uses
+    consumes: [ParseVersion]
