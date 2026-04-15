@@ -21,11 +21,21 @@ type Core interface {
 	GetVertexPositions(uintptr) [][]drawable.Vector2
 	GetDrawables(uintptr) []drawable.Drawable
 	GetParameters(uintptr) []parameter.Parameter
+	GetParameterIds(uintptr) []string
 	GetParameterValue(uintptr, string) float32
 	SetParameterValue(uintptr, string, float32)
+	GetParameterValueByIndex(uintptr, int) float32
+	SetParameterValueByIndex(uintptr, int, float32)
+	GetParameterCount(uintptr) int
+	GetParameterValues(uintptr) []float32
+	GetParameterMinimumValues(uintptr) []float32
+	GetParameterMaximumValues(uintptr) []float32
+	GetParameterDefaultValues(uintptr) []float32
 	GetPartIds(uintptr) []string
 	GetPartOpacities(uintptr) []float32
 	SetPartOpacity(uintptr, string, float32)
+	SetPartOpacityByIndex(uintptr, int, float32)
+	GetPartOpacityByIndex(uintptr, int) float32
 	GetSortedDrawableIndices(uintptr) []int
 	GetCanvasInfo(uintptr) (drawable.Vector2, drawable.Vector2, float32)
 	Update(uintptr)

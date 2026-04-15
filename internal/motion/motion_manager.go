@@ -4,150 +4,80 @@ import (
 	"github.com/shaolei/cubism-go/internal/core"
 )
 
-type MotionManager struct {
-	core            core.Core
-	modelPtr        uintptr
-	queue           []Entry
-	lastId          int
-	onFinished      func(int)
-	savedParameters map[string]float32
+// Priority levels for motion playback
+const (
+	PriorityNone       = 0
+	PriorityIdle       = 1
+	PriorityNormal     = 2
+	PriorityForce      = 3
+)
+
+// CubismMotionManager extends CubismMotionQueueManager with a priority system,
+// matching the official SDK's CubismMotionManager design.
+// Only motions with higher or equal priority than the current reservation
+// can be started.
+type CubismMotionManager struct {
+	*CubismMotionQueueManager
+	currentPriority int
+	reservePriority int
 }
 
-func NewMotionManager(core core.Core, modelPtr uintptr, onFinished func(int)) *MotionManager {
-	return &MotionManager{
-		core:            core,
-		modelPtr:        modelPtr,
-		queue:           []Entry{},
-		lastId:          0,
-		onFinished:      onFinished,
-		savedParameters: make(map[string]float32),
-	}
-}
-
-func (mm *MotionManager) Start(motion Motion) int {
-	mm.lastId++
-	mm.queue = append(mm.queue, Entry{
-		motion:      motion,
-		id:          mm.lastId,
-		currentTime: 0,
-	})
-	return mm.lastId
-}
-
-func (mm *MotionManager) Close(id int) {
-	index := -1
-	for i, entry := range mm.queue {
-		if entry.id == id {
-			index = i
-			break
-		}
-	}
-	if index == -1 {
-		return
-	}
-	if mm.queue[index].motion.Sound != "" {
-		mm.queue[index].motion.LoadedSound.Close()
-	}
-	mm.queue = append(mm.queue[:index], mm.queue[index+1:]...)
-}
-
-func (mm *MotionManager) Reset(id int) {
-	index := -1
-	for i, entry := range mm.queue {
-		if entry.id == id {
-			index = i
-			break
-		}
-	}
-	if index == -1 {
-		return
-	}
-	mm.queue[index].currentTime = 0
-}
-
-func (mm *MotionManager) saveParameters() {
-	parameters := mm.core.GetParameters(mm.modelPtr)
-	savedParameters := make(map[string]float32)
-	for _, parameter := range parameters {
-		savedParameters[parameter.Id] = parameter.Current
-	}
-	mm.savedParameters = savedParameters
-}
-
-func (mm *MotionManager) loadParameters() {
-	if mm.savedParameters == nil {
-		return
-	}
-	for id, value := range mm.savedParameters {
-		mm.core.SetParameterValue(mm.modelPtr, id, value)
+// NewCubismMotionManager creates a new priority-based motion manager
+func NewCubismMotionManager(c core.Core, modelPtr uintptr, onFinished func(int)) *CubismMotionManager {
+	return &CubismMotionManager{
+		CubismMotionQueueManager: NewCubismMotionQueueManager(c, modelPtr, onFinished),
+		currentPriority:          PriorityNone,
+		reservePriority:          PriorityNone,
 	}
 }
 
-func (mm *MotionManager) Update(deltaTime float64) {
-	if len(mm.queue) == 0 {
-		return
-	}
-	finished := mm.queue[len(mm.queue)-1].Update(deltaTime)
-	if finished {
-		mm.onFinished(mm.queue[len(mm.queue)-1].id)
-	}
-	if len(mm.queue) == 0 {
-		return
-	}
-	mm.loadParameters()
+// GetCurrentPriority returns the priority of the currently playing motion
+func (mm *CubismMotionManager) GetCurrentPriority() int {
+	return mm.currentPriority
+}
 
-	entry := mm.queue[len(mm.queue)-1]
-	if entry.currentTime == deltaTime {
-		if entry.motion.Sound != "" {
-			entry.motion.LoadedSound.Play()
-		}
+// GetReservePriority returns the reserved priority for the next motion
+func (mm *CubismMotionManager) GetReservePriority() int {
+	return mm.reservePriority
+}
+
+// SetReservePriority sets the reserved priority for the next motion
+func (mm *CubismMotionManager) SetReservePriority(priority int) {
+	mm.reservePriority = priority
+}
+
+// CanStartMotion checks whether a motion with the given priority can be started
+func (mm *CubismMotionManager) CanStartMotion(priority int) bool {
+	if priority == PriorityForce {
+		return true
 	}
-	fadeIn, fadeOut, fadeWeight := getFade(entry.motion, 1.0, entry.currentTime)
-	for _, curve := range entry.motion.Curves {
-		for _, seg := range curve.Segments {
-			if !segmentIntersects(seg, entry.currentTime) {
-				continue
-			}
-			value := segmentInterpolate(seg, entry.currentTime)
-			if curve.Target == "Model" {
-				// TODO implement
-			}
-			if curve.Target == "PartOpacity" {
-				mm.core.SetPartOpacity(mm.modelPtr, curve.Id, float32(value))
-			}
-			if curve.Target == "Parameter" {
-				var v float32
-				sourceValue := mm.core.GetParameterValue(mm.modelPtr, curve.Id)
-				if curve.FadeInTime < 0.0 && curve.FadeOutTime < 0.0 {
-					// If the fade is not set for the parameter, apply the motion fade
-					v = sourceValue + (float32(value)-sourceValue)*float32(fadeWeight)
-				} else {
-					// If a fade is set for the parameter, apply that fade
-					var fin, fout float64
-					if curve.FadeInTime < 0 {
-						fin = fadeIn
-					} else {
-						if curve.FadeInTime == 0.0 {
-							fin = 1.0
-						} else {
-							fin = getEasingSine(entry.currentTime / curve.FadeInTime)
-						}
-					}
-					if curve.FadeOutTime < 0 {
-						fout = fadeOut
-					} else {
-						if curve.FadeOutTime == 0.0 {
-							fout = 1.0
-						} else {
-							fout = getEasingSine((entry.motion.Meta.Duration - entry.currentTime) / curve.FadeOutTime)
-						}
-					}
-					paramWeight := 1.0 * fin * fout
-					v = sourceValue + (float32(value)-sourceValue)*float32(paramWeight)
-				}
-				mm.core.SetParameterValue(mm.modelPtr, curve.Id, v)
-			}
-		}
+	// Can start if reserve priority allows it
+	if mm.reservePriority == PriorityNone {
+		return true
 	}
-	mm.saveParameters()
+	return priority >= mm.reservePriority
+}
+
+// StartMotion starts a motion with the given priority.
+// Returns -1 if the motion cannot be started due to priority constraints.
+func (mm *CubismMotionManager) StartMotionWithPriority(mtn Motion, loop bool, priority int) int {
+	if !mm.CanStartMotion(priority) {
+		return -1
+	}
+
+	mm.currentPriority = priority
+	mm.reservePriority = PriorityNone
+
+	id := mm.CubismMotionQueueManager.StartMotion(mtn, loop, false)
+	return id
+}
+
+// Update is the main update loop for the motion manager
+func (mm *CubismMotionManager) Update(deltaTime float64) {
+	mm.DoUpdateMotion(deltaTime)
+
+	// Reset priority when all motions have finished
+	if mm.IsFinished() {
+		mm.currentPriority = PriorityNone
+	}
 }

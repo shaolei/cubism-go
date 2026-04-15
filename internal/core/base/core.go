@@ -6,12 +6,12 @@ import (
 	"sort"
 	"unsafe"
 
+	"github.com/ebitengine/purego"
 	"github.com/shaolei/cubism-go/internal/core/drawable"
 	"github.com/shaolei/cubism-go/internal/core/moc"
 	"github.com/shaolei/cubism-go/internal/core/parameter"
 	"github.com/shaolei/cubism-go/internal/strings"
 	"github.com/shaolei/cubism-go/internal/utils"
-	"github.com/ebitengine/purego"
 )
 
 // Funcs holds all the common Cubism Core function pointers shared across versions.
@@ -270,7 +270,8 @@ func GetParameters(f *Funcs, modelPtr uintptr) (parameters []parameter.Parameter
 	return
 }
 
-// GetParameterValue returns the value of a parameter by ID
+// GetParameterValue returns the value of a parameter by ID (string lookup, O(n))
+// Prefer GetParameterValueByIndex for hot-path code.
 func GetParameterValue(f *Funcs, modelPtr uintptr, id string) float32 {
 	count := f.CsmGetParameterCount(modelPtr)
 	idsPtr := f.CsmGetParameterIds(modelPtr)
@@ -285,7 +286,20 @@ func GetParameterValue(f *Funcs, modelPtr uintptr, id string) float32 {
 	return 0
 }
 
-// SetParameterValue sets the value of a parameter by ID
+// GetParameterValueByIndex returns the value of a parameter by its array index (O(1))
+// The index should be obtained from CubismIdManager.GetParameterId().
+func GetParameterValueByIndex(f *Funcs, modelPtr uintptr, index int) float32 {
+	count := f.CsmGetParameterCount(modelPtr)
+	if index < 0 || index >= count {
+		return 0
+	}
+	valPtr := f.CsmGetParameterValues(modelPtr)
+	vals := unsafe.Slice((*float32)(unsafe.Pointer(valPtr)), count)
+	return vals[index]
+}
+
+// SetParameterValue sets the value of a parameter by ID (string lookup, O(n))
+// Prefer SetParameterValueByIndex for hot-path code.
 func SetParameterValue(f *Funcs, modelPtr uintptr, id string, value float32) {
 	count := f.CsmGetParameterCount(modelPtr)
 	idsPtr := f.CsmGetParameterIds(modelPtr)
@@ -297,6 +311,30 @@ func SetParameterValue(f *Funcs, modelPtr uintptr, id string, value float32) {
 			return
 		}
 	}
+}
+
+// SetParameterValueByIndex sets the value of a parameter by its array index (O(1))
+// The index should be obtained from CubismIdManager.GetParameterId().
+func SetParameterValueByIndex(f *Funcs, modelPtr uintptr, index int, value float32) {
+	count := f.CsmGetParameterCount(modelPtr)
+	if index < 0 || index >= count {
+		return
+	}
+	valPtr := f.CsmGetParameterValues(modelPtr)
+	*(*float32)(unsafe.Pointer(valPtr + uintptr(index)*unsafe.Sizeof(float32(0)))) = value
+}
+
+// GetParameterIds returns all parameter ID strings in their array order.
+// Used by CubismIdManager to build the ID→index mapping.
+func GetParameterIds(f *Funcs, modelPtr uintptr) []string {
+	count := f.CsmGetParameterCount(modelPtr)
+	idsPtr := f.CsmGetParameterIds(modelPtr)
+	ids := make([]string, 0, count)
+	for i := 0; i < count; i++ {
+		ptr := *(**byte)(unsafe.Pointer(idsPtr + uintptr(i)*unsafe.Sizeof(uintptr(0))))
+		ids = append(ids, strings.GoString(uintptr(unsafe.Pointer(ptr))))
+	}
+	return ids
 }
 
 // GetPartOpacities returns the opacities for all parts
@@ -317,7 +355,8 @@ func GetPartIds(f *Funcs, modelPtr uintptr) (ids []string) {
 	return
 }
 
-// SetPartOpacity sets the opacity of a part by ID
+// SetPartOpacity sets the opacity of a part by ID (string lookup)
+// Prefer SetPartOpacityByIndex for hot-path code.
 func SetPartOpacity(f *Funcs, modelPtr uintptr, id string, value float32) {
 	ids := GetPartIds(f, modelPtr)
 	ptr := f.CsmGetPartOpacities(modelPtr)
@@ -327,6 +366,28 @@ func SetPartOpacity(f *Funcs, modelPtr uintptr, id string, value float32) {
 			return
 		}
 	}
+}
+
+// SetPartOpacityByIndex sets the opacity of a part by its array index (O(1))
+// The index should be obtained from CubismIdManager.GetPartId().
+func SetPartOpacityByIndex(f *Funcs, modelPtr uintptr, index int, value float32) {
+	count := f.CsmGetPartCount(modelPtr)
+	if index < 0 || index >= count {
+		return
+	}
+	ptr := f.CsmGetPartOpacities(modelPtr)
+	*(*float32)(unsafe.Pointer(ptr + uintptr(index)*unsafe.Sizeof(float32(0)))) = value
+}
+
+// GetPartOpacityByIndex returns the opacity of a part by its array index (O(1))
+// The index should be obtained from CubismIdManager.GetPartId().
+func GetPartOpacityByIndex(f *Funcs, modelPtr uintptr, index int) float32 {
+	count := f.CsmGetPartCount(modelPtr)
+	if index < 0 || index >= count {
+		return 0
+	}
+	opacities := unsafe.Slice((*float32)(unsafe.Pointer(f.CsmGetPartOpacities(modelPtr))), count)
+	return opacities[index]
 }
 
 // GetSortedDrawableIndices returns the drawing order indices sorted by sort orders.
@@ -345,7 +406,7 @@ func GetSortedDrawableIndices(f *Funcs, modelPtr uintptr) (rs []int) {
 	for i := 0; i < count; i++ {
 		entries[i] = orderEntry{index: i, order: rawOrders[i]}
 	}
-	sort.Slice(entries, func(i, j int) bool {
+	sort.SliceStable(entries, func(i, j int) bool {
 		return entries[i].order < entries[j].order
 	})
 
@@ -354,6 +415,37 @@ func GetSortedDrawableIndices(f *Funcs, modelPtr uintptr) (rs []int) {
 		rs[i] = e.index
 	}
 	return
+}
+
+// GetParameterCount returns the number of parameters in the model.
+func GetParameterCount(f *Funcs, modelPtr uintptr) int {
+	return f.CsmGetParameterCount(modelPtr)
+}
+
+// GetParameterValues returns all parameter values as a direct float32 slice.
+// This is the efficient path used by the physics engine and other subsystems
+// that need bulk access to parameter values.
+func GetParameterValues(f *Funcs, modelPtr uintptr) []float32 {
+	count := f.CsmGetParameterCount(modelPtr)
+	return unsafe.Slice((*float32)(unsafe.Pointer(f.CsmGetParameterValues(modelPtr))), count)
+}
+
+// GetParameterMinimumValues returns all parameter minimum values as a direct float32 slice.
+func GetParameterMinimumValues(f *Funcs, modelPtr uintptr) []float32 {
+	count := f.CsmGetParameterCount(modelPtr)
+	return unsafe.Slice((*float32)(unsafe.Pointer(f.CsmGetParameterMinimumValues(modelPtr))), count)
+}
+
+// GetParameterMaximumValues returns all parameter maximum values as a direct float32 slice.
+func GetParameterMaximumValues(f *Funcs, modelPtr uintptr) []float32 {
+	count := f.CsmGetParameterCount(modelPtr)
+	return unsafe.Slice((*float32)(unsafe.Pointer(f.CsmGetParameterMaximumValues(modelPtr))), count)
+}
+
+// GetParameterDefaultValues returns all parameter default values as a direct float32 slice.
+func GetParameterDefaultValues(f *Funcs, modelPtr uintptr) []float32 {
+	count := f.CsmGetParameterCount(modelPtr)
+	return unsafe.Slice((*float32)(unsafe.Pointer(f.CsmGetParameterDefaultValues(modelPtr))), count)
 }
 
 // GetCanvasInfo returns the canvas size, origin, and pixels per unit

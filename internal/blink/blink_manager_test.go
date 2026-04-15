@@ -20,20 +20,28 @@ func newMockCore() *mockCore {
 func (m *mockCore) SetParameterValue(_ uintptr, id string, value float32) {
 	m.setValues[id] = value
 }
-func (m *mockCore) LoadMoc(_ string) (moc.Moc, error)        { return moc.Moc{}, nil }
-func (m *mockCore) GetVersion() string                         { return "" }
-func (m *mockCore) GetDynamicFlags(_ uintptr) []drawable.DynamicFlag { return nil }
-func (m *mockCore) GetOpacities(_ uintptr) []float32           { return nil }
-func (m *mockCore) GetVertexPositions(_ uintptr) [][]drawable.Vector2 {
-	return nil
-}
-func (m *mockCore) GetDrawables(_ uintptr) []drawable.Drawable    { return nil }
-func (m *mockCore) GetParameters(_ uintptr) []parameter.Parameter { return nil }
-func (m *mockCore) GetParameterValue(_ uintptr, _ string) float32 { return 0 }
-func (m *mockCore) GetPartIds(_ uintptr) []string                 { return nil }
-func (m *mockCore) GetPartOpacities(_ uintptr) []float32          { return nil }
-func (m *mockCore) SetPartOpacity(_ uintptr, _ string, _ float32) {}
-func (m *mockCore) GetSortedDrawableIndices(_ uintptr) []int      { return nil }
+func (m *mockCore) SetParameterValueByIndex(_ uintptr, _ int, _ float32) {}
+func (m *mockCore) GetParameterValueByIndex(_ uintptr, _ int) float32    { return 0 }
+func (m *mockCore) GetParameterIds(_ uintptr) []string                   { return nil }
+func (m *mockCore) SetPartOpacityByIndex(_ uintptr, _ int, _ float32)    {}
+func (m *mockCore) GetPartOpacityByIndex(_ uintptr, _ int) float32      { return 0 }
+func (m *mockCore) LoadMoc(_ string) (moc.Moc, error)                    { return moc.Moc{}, nil }
+func (m *mockCore) GetVersion() string                                    { return "" }
+func (m *mockCore) GetDynamicFlags(_ uintptr) []drawable.DynamicFlag      { return nil }
+func (m *mockCore) GetOpacities(_ uintptr) []float32                     { return nil }
+func (m *mockCore) GetVertexPositions(_ uintptr) [][]drawable.Vector2    { return nil }
+func (m *mockCore) GetDrawables(_ uintptr) []drawable.Drawable           { return nil }
+func (m *mockCore) GetParameters(_ uintptr) []parameter.Parameter        { return nil }
+func (m *mockCore) GetParameterValue(_ uintptr, _ string) float32        { return 0 }
+func (m *mockCore) GetParameterCount(_ uintptr) int                          { return 0 }
+func (m *mockCore) GetParameterValues(_ uintptr) []float32                   { return nil }
+func (m *mockCore) GetParameterMinimumValues(_ uintptr) []float32            { return nil }
+func (m *mockCore) GetParameterMaximumValues(_ uintptr) []float32            { return nil }
+func (m *mockCore) GetParameterDefaultValues(_ uintptr) []float32            { return nil }
+func (m *mockCore) GetPartIds(_ uintptr) []string                        { return nil }
+func (m *mockCore) GetPartOpacities(_ uintptr) []float32                 { return nil }
+func (m *mockCore) SetPartOpacity(_ uintptr, _ string, _ float32)        {}
+func (m *mockCore) GetSortedDrawableIndices(_ uintptr) []int             { return nil }
 func (m *mockCore) GetCanvasInfo(_ uintptr) (drawable.Vector2, drawable.Vector2, float32) {
 	return drawable.Vector2{}, drawable.Vector2{}, 0
 }

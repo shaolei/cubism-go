@@ -12,6 +12,11 @@ func getEasingSine(value float64) float64 {
 	return 0.5 - 0.5*math.Cos(value*math.Pi)
 }
 
+// GetEasingSine is the exported version of getEasingSine for use by other packages
+func GetEasingSine(value float64) float64 {
+	return getEasingSine(value)
+}
+
 func lerpPoints(a Point, b Point, t float64) Point {
 	return Point{
 		Time:  a.Time + (b.Time-a.Time)*t,
@@ -65,20 +70,4 @@ func segmentInterpolate(segment Segment, t float64) float64 {
 		return segment.Points[0].Value
 	}
 	return 0
-}
-
-func getFade(motion Motion, weight float64, t float64) (fadeIn, fadeOut, fadeWeight float64) {
-	fadeWeight = weight
-	if motion.FadeInTime == 0.0 {
-		fadeIn = 1.0
-	} else {
-		fadeIn = getEasingSine(t / motion.FadeInTime)
-	}
-	if motion.FadeOutTime == 0.0 || motion.Meta.Duration < 0.0 {
-		fadeOut = 1.0
-	} else {
-		fadeOut = getEasingSine((motion.Meta.Duration - t) / motion.FadeOutTime)
-	}
-	fadeWeight = fadeWeight * fadeIn * fadeOut
-	return
 }

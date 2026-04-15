@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	"github.com/shaolei/cubism-go/internal/core"
+	"github.com/shaolei/cubism-go/internal/id"
 )
 
 const (
@@ -17,7 +18,9 @@ const (
 type BlinkManager struct {
 	core             core.Core
 	modelPtr         uintptr
+	idManager        *id.CubismIdManager
 	ids              []string
+	idHandles        []id.CubismIdHandle
 	state            int
 	interval         float64
 	closing          float64
@@ -39,6 +42,20 @@ func NewBlinkManager(core core.Core, modelPtr uintptr, ids []string) *BlinkManag
 		currentTime:      0,
 		stateStartTime:   0,
 		nextBlinkingTime: 0,
+	}
+}
+
+// SetIdManager sets the CubismIdManager for fast parameter access by index
+func (b *BlinkManager) SetIdManager(idMgr *id.CubismIdManager) {
+	b.idManager = idMgr
+	// Pre-resolve all blink parameter IDs to handles
+	b.idHandles = make([]id.CubismIdHandle, len(b.ids))
+	for i, idStr := range b.ids {
+		if idMgr != nil {
+			b.idHandles[i] = idMgr.GetParameterId(idStr)
+		} else {
+			b.idHandles[i] = id.InvalidHandle
+		}
 	}
 }
 
@@ -87,7 +104,11 @@ func (b *BlinkManager) Update(delta float64) {
 		value = float32(t)
 	}
 
-	for _, id := range b.ids {
-		b.core.SetParameterValue(b.modelPtr, id, value)
+	for i, id := range b.ids {
+		if b.idManager != nil && b.idHandles[i].IsValid() {
+			b.core.SetParameterValueByIndex(b.modelPtr, int(b.idHandles[i]), value)
+		} else {
+			b.core.SetParameterValue(b.modelPtr, id, value)
+		}
 	}
 }

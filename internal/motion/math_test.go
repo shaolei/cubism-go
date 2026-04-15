@@ -183,67 +183,98 @@ func TestSegmentInterpolate(t *testing.T) {
 	})
 }
 
-func TestGetFade(t *testing.T) {
+func TestCubismMotionQueueEntryFadeWeight(t *testing.T) {
 	t.Parallel()
 
 	t.Run("no fade times returns full weight", func(t *testing.T) {
 		m := Motion{FadeInTime: 0, FadeOutTime: 0, Meta: Meta{Duration: 5}}
-		_, _, fadeWeight := getFade(m, 1.0, 2.5)
-		if fadeWeight != 1.0 {
-			t.Errorf("no fade: weight = %v, want 1.0", fadeWeight)
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		entry.Start(0.0)
+		entry.UpdateFadeWeight(2.5)
+		if entry.GetFadeWeight() != 1.0 {
+			t.Errorf("no fade: weight = %v, want 1.0", entry.GetFadeWeight())
 		}
 	})
 
 	t.Run("with fade in", func(t *testing.T) {
 		m := Motion{FadeInTime: 1.0, FadeOutTime: 0, Meta: Meta{Duration: 5}}
-		fadeIn, _, _ := getFade(m, 1.0, 0.5)
-		if fadeIn >= 1.0 {
-			t.Errorf("fade in at t=0.5 with fadeInTime=1.0 should be < 1.0, got %v", fadeIn)
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		entry.Start(0.0)
+		entry.UpdateFadeWeight(0.5)
+		fadeWeight := entry.GetFadeWeight()
+		if fadeWeight >= 1.0 {
+			t.Errorf("fade in at t=0.5 with fadeInTime=1.0 should be < 1.0, got %v", fadeWeight)
 		}
 	})
 
 	t.Run("with fade out", func(t *testing.T) {
 		m := Motion{FadeInTime: 0, FadeOutTime: 1.0, Meta: Meta{Duration: 5}}
-		_, fadeOut, _ := getFade(m, 1.0, 4.5)
-		if fadeOut >= 1.0 {
-			t.Errorf("fade out near end should be < 1.0, got %v", fadeOut)
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		entry.Start(0.0)
+		entry.UpdateFadeWeight(4.5)
+		fadeWeight := entry.GetFadeWeight()
+		if fadeWeight >= 1.0 {
+			t.Errorf("fade out near end should be < 1.0, got %v", fadeWeight)
 		}
 	})
 
-	t.Run("negative duration skips fade out", func(t *testing.T) {
+	t.Run("explicit fade out", func(t *testing.T) {
+		m := Motion{FadeInTime: 0, FadeOutTime: 1.0, Meta: Meta{Duration: 5}}
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		entry.Start(0.0)
+		entry.StartFadeout(1.0, 3.0)
+		entry.UpdateFadeWeight(3.5)
+		fadeWeight := entry.GetFadeWeight()
+		if fadeWeight >= 1.0 {
+			t.Errorf("explicit fade out at 3.5 (started at 3.0, duration 1.0) should be < 1.0, got %v", fadeWeight)
+		}
+	})
+
+	t.Run("negative duration no natural fade out", func(t *testing.T) {
 		m := Motion{FadeInTime: 0, FadeOutTime: 1.0, Meta: Meta{Duration: -1}}
-		_, fadeOut, _ := getFade(m, 1.0, 5.0)
-		if fadeOut != 1.0 {
-			t.Errorf("negative duration should skip fade out, got %v", fadeOut)
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		entry.Start(0.0)
+		entry.UpdateFadeWeight(5.0)
+		fadeWeight := entry.GetFadeWeight()
+		if fadeWeight != 1.0 {
+			t.Errorf("negative duration should skip fade out, got %v", fadeWeight)
 		}
 	})
 }
 
-func TestEntryUpdate(t *testing.T) {
+func TestCubismMotionQueueEntryLifecycle(t *testing.T) {
 	t.Parallel()
 
-	t.Run("not finished before duration", func(t *testing.T) {
-		e := &Entry{
-			motion:      Motion{Meta: Meta{Duration: 5.0}},
-			currentTime: 0,
+	t.Run("starts on first update", func(t *testing.T) {
+		m := Motion{Meta: Meta{Duration: 5.0}}
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		if entry.IsStarted() {
+			t.Error("entry should not be started before Start()")
 		}
-		finished := e.Update(1.0)
-		if finished {
-			t.Error("should not be finished before duration")
-		}
-		if e.currentTime != 1.0 {
-			t.Errorf("currentTime = %v, want 1.0", e.currentTime)
+		entry.Start(0.0)
+		if !entry.IsStarted() {
+			t.Error("entry should be started after Start()")
 		}
 	})
 
-	t.Run("finished at duration", func(t *testing.T) {
-		e := &Entry{
-			motion:      Motion{Meta: Meta{Duration: 2.0}},
-			currentTime: 1.5,
+	t.Run("local time calculation", func(t *testing.T) {
+		m := Motion{Meta: Meta{Duration: 5.0}}
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		entry.Start(1.0)
+		localTime := entry.GetLocalTime(3.5)
+		if localTime != 2.5 {
+			t.Errorf("localTime = %v, want 2.5", localTime)
 		}
-		finished := e.Update(1.0)
-		if !finished {
-			t.Error("should be finished at duration")
+	})
+
+	t.Run("restart resets timing", func(t *testing.T) {
+		m := Motion{Meta: Meta{Duration: 5.0}}
+		entry := newCubismMotionQueueEntry(m, 1, false)
+		entry.Start(0.0)
+		entry.Restart(10.0)
+		localTime := entry.GetLocalTime(12.0)
+		if localTime != 2.0 {
+			t.Errorf("localTime after restart = %v, want 2.0", localTime)
 		}
 	})
 }

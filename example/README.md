@@ -34,8 +34,33 @@ cd example
 go run main.go
 ```
 
+### Command Line Flags
+
+- `-model` — Path to the `.model3.json` file (default: `example/Resources/Haru/Haru.model3.json`)
+- `-lib` — Path to the Cubism Core library (default: `example/Live2DCubismCore.dll`)
+
 ## Controls
 
-- Click on the model's hit areas to trigger the `TapBody` motion
-- The cursor changes to a pointer when hovering over a hit area
-- Idle motion plays automatically on startup
+| Key | Action |
+|-----|--------|
+| **Click** | Click on the model's hit areas to trigger the `TapBody` motion |
+| **0** | Stop the current expression |
+| **1-9** | Switch to the corresponding expression |
+| **L** | Toggle look/eye-tracking (follows mouse cursor) |
+| **B** | Enable the breathing effect |
+| **P** | Disable physics simulation |
+| **R** | Reset physics to default gravity/wind |
+
+The cursor changes to a pointer when hovering over a hit area.
+
+## Architecture
+
+The example demonstrates the core features of cubism-go:
+
+- **CubismModel / CubismUserModel** — The model is split into a pure data layer (`CubismModel`) and a composition manager (`CubismUserModel`). The public `Model` type acts as a facade.
+- **Motion** — Idle motion plays on startup; tap motions are triggered by clicking hit areas.
+- **Expression** — Switch between expressions using number keys.
+- **Look** — Eye-tracking follows the mouse cursor in real-time.
+- **Breath** — Subtle body movement via sine wave oscillation.
+- **Physics** — Hair and clothing physics with configurable gravity/wind.
+- **Auto Blink** — Automatic eye blinking that pauses during motion playback.

@@ -4,10 +4,11 @@ package model
 type PhysicsJson struct {
 	Version int `json:"Version"`
 	Meta    struct {
-		PhysicsSettingCount int `json:"PhysicsSettingCount"`
-		TotalInputCount     int `json:"TotalInputCount"`
-		TotalOutputCount    int `json:"TotalOutputCount"`
-		VertexCount         int `json:"VertexCount"`
+		PhysicsSettingCount int     `json:"PhysicsSettingCount"`
+		TotalInputCount     int     `json:"TotalInputCount"`
+		TotalOutputCount    int     `json:"TotalOutputCount"`
+		VertexCount         int     `json:"VertexCount"`
+		Fps                 float64 `json:"Fps"`
 		EffectiveForces     struct {
 			Gravity struct {
 				X float64 `json:"X"`

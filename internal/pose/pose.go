@@ -2,13 +2,19 @@ package pose
 
 import (
 	"github.com/shaolei/cubism-go/internal/core"
+	"github.com/shaolei/cubism-go/internal/id"
 	"github.com/shaolei/cubism-go/internal/model"
 )
 
-// Epsilon is the threshold for determining if a part should be visible
-const Epsilon = 0.001
+const (
+	Epsilon                = 0.001
+	DefaultFadeInSeconds   = 0.5
+	Phi                    = 0.5   // Cross-fade intersection point
+	BackOpacityThreshold   = 0.15  // Maximum background visibility ratio
+)
 
-// PartData represents a single part entry in a pose group
+// PartData represents a single part entry in a pose group.
+// Matches the official SDK's CubismPose::PartData structure.
 type PartData struct {
 	PartId         string
 	ParameterIndex int // index into the parameter array (-1 if not found)
@@ -16,33 +22,41 @@ type PartData struct {
 	Link           []PartData
 }
 
-// PoseManager manages pose groups and applies part opacity transitions
+// PoseManager manages pose groups and applies part opacity transitions.
+// Matches the official SDK's CubismPose design with:
+//   - Flat partGroups array with partGroupCounts for grouping
+//   - DoFade with Phi/BackOpacityThreshold cross-fade algorithm
+//   - CopyPartOpacities for Link handling (separate from DoFade)
+//   - Reset for initial state setup
 type PoseManager struct {
-	groups         [][]PartData
-	fadeInTime     float64
-	lastDelta      float64
-	partGroupCounts []int
+	partGroups      []PartData // flat array of all parts across all groups
+	partGroupCounts []int      // count of parts in each group
+	fadeTimeSeconds float64
+	lastModelPtr    uintptr // track model pointer for Reset detection
+	idManager       *id.CubismIdManager
 }
 
-// NewPoseManager creates a new PoseManager from pose3.json data
-func NewPoseManager(poseJson model.PoseJson, core core.Core, modelPtr uintptr) *PoseManager {
+// NewPoseManager creates a new PoseManager from pose3.json data.
+// Matches the official SDK's CubismPose::Create parsing logic.
+func NewPoseManager(poseJson model.PoseJson, c core.Core, modelPtr uintptr) *PoseManager {
 	pm := &PoseManager{
-		fadeInTime: poseJson.FadeInTime,
+		fadeTimeSeconds: poseJson.FadeInTime,
+	}
+
+	// Validate fade time
+	if pm.fadeTimeSeconds < 0.0 {
+		pm.fadeTimeSeconds = DefaultFadeInSeconds
 	}
 
 	// Get parameter IDs and part IDs for index lookup
-	allParamIds := getParameterIds(core, modelPtr)
-	partIds := core.GetPartIds(modelPtr)
+	allParamIds := getParameterIds(c, modelPtr)
+	partIds := c.GetPartIds(modelPtr)
 
-	// Build pose groups
-	pm.groups = make([][]PartData, len(poseJson.Groups))
-	pm.partGroupCounts = make([]int, len(poseJson.Groups))
-
-	for i, group := range poseJson.Groups {
-		pm.groups[i] = make([]PartData, len(group))
-		pm.partGroupCounts[i] = len(group)
-
-		for j, entry := range group {
+	// Build flat partGroups array and partGroupCounts
+	// Matches official SDK's flat structure with group counts
+	for _, group := range poseJson.Groups {
+		groupCount := 0
+		for _, entry := range group {
 			pd := PartData{
 				PartId:         entry.Id,
 				ParameterIndex: findIndex(allParamIds, entry.Id),
@@ -57,114 +71,250 @@ func NewPoseManager(poseJson model.PoseJson, core core.Core, modelPtr uintptr) *
 				}
 				pd.Link = append(pd.Link, linkPd)
 			}
-			pm.groups[i][j] = pd
+			pm.partGroups = append(pm.partGroups, pd)
+			groupCount++
 		}
+		pm.partGroupCounts = append(pm.partGroupCounts, groupCount)
 	}
 
-	// Initialize: set first part in each group to visible
-	for _, group := range pm.groups {
-		if len(group) > 0 {
-			// Set default: first part visible
-			for j := range group {
-				if j == 0 {
-					core.SetPartOpacity(modelPtr, group[j].PartId, 1.0)
-					for _, link := range group[j].Link {
-						core.SetPartOpacity(modelPtr, link.PartId, 1.0)
-					}
-				}
-			}
-		}
-	}
+	// Initialize parts
+	pm.Reset(c, modelPtr)
 
 	return pm
 }
 
-// Update applies pose logic — should be called after motion update but before model.Update()
-// However, since model.Update() is called in the main update loop, we apply pose
-// after core.Update() to override part opacities based on the current state.
-func (pm *PoseManager) Update(core core.Core, modelPtr uintptr, deltaTime float64) {
-	pm.lastDelta = deltaTime
+// SetIdManager sets the CubismIdManager for fast parameter/part access by index
+func (pm *PoseManager) SetIdManager(idMgr *id.CubismIdManager) {
+	pm.idManager = idMgr
+}
 
-	// Process each pose group
-	for _, group := range pm.groups {
-		// Find which part in this group should be visible based on parameter values
-		visibleIndex := -1
-		maxOpacity := float32(-1.0)
+// Reset initializes the pose state, setting the first part in each group to visible.
+// Matches the official SDK's CubismPose::Reset.
+func (pm *PoseManager) Reset(c core.Core, modelPtr uintptr) {
+	beginIndex := 0
 
-		for j, part := range group {
-			if part.ParameterIndex >= 0 {
-				// Check if this part's parameter value indicates visibility
-				paramValue := core.GetParameterValue(modelPtr, part.PartId)
-				if paramValue > Epsilon {
-					visibleIndex = j
+	for i := 0; i < len(pm.partGroupCounts); i++ {
+		groupCount := pm.partGroupCounts[i]
+
+		for j := beginIndex; j < beginIndex+groupCount; j++ {
+			pd := &pm.partGroups[j]
+
+			// Initialize parameter value to 1 for this part
+			if pd.ParameterIndex >= 0 {
+				if pm.idManager != nil {
+					c.SetParameterValueByIndex(modelPtr, pd.ParameterIndex, 1.0)
+				} else {
+					c.SetParameterValue(modelPtr, pd.PartId, 1.0)
 				}
 			}
-			// Also check current part opacity
-			currentOpacity := core.GetPartOpacities(modelPtr)
-			if part.PartIndex >= 0 && part.PartIndex < len(currentOpacity) {
-				if currentOpacity[part.PartIndex] > maxOpacity {
-					maxOpacity = currentOpacity[part.PartIndex]
+
+			// Set part opacity: first in group = 1.0, others = 0.0
+			if pd.PartIndex >= 0 {
+				opacity := float32(0.0)
+				if j == beginIndex {
+					opacity = 1.0
+				}
+				if pm.idManager != nil {
+					c.SetPartOpacityByIndex(modelPtr, pd.PartIndex, opacity)
+				} else {
+					c.SetPartOpacity(modelPtr, pd.PartId, opacity)
+				}
+			}
+
+			// Initialize links
+			for k := range pd.Link {
+				link := &pd.Link[k]
+				if link.ParameterIndex >= 0 {
+					if pm.idManager != nil {
+						c.SetParameterValueByIndex(modelPtr, link.ParameterIndex, 1.0)
+					} else {
+						c.SetParameterValue(modelPtr, link.PartId, 1.0)
+					}
 				}
 			}
 		}
 
-		// If no parameter explicitly set visibility, use the first part as default
-		if visibleIndex == -1 {
-			visibleIndex = 0
-		}
-
-		// Apply fade to the group
-		pm.doFade(core, modelPtr, group, visibleIndex, deltaTime)
+		beginIndex += groupCount
 	}
 }
 
-// doFade applies fade-in/fade-out transitions to parts in a group
-func (pm *PoseManager) doFade(core core.Core, modelPtr uintptr, group []PartData, visibleIndex int, deltaTime float64) {
-	fadeInTime := pm.fadeInTime
-	if fadeInTime <= 0 {
-		fadeInTime = 0.5 // default fade time
+// Update applies pose logic.
+// Matches the official SDK's CubismPose::UpdateParameters:
+// 1. If model changed, Reset
+// 2. For each group: DoFade
+// 3. CopyPartOpacities for Link handling
+func (pm *PoseManager) Update(c core.Core, modelPtr uintptr, deltaTimeSeconds float64) {
+	// If the model has changed, reset
+	if modelPtr != pm.lastModelPtr {
+		pm.Reset(c, modelPtr)
+	}
+	pm.lastModelPtr = modelPtr
+
+	// Clamp negative delta time
+	if deltaTimeSeconds < 0.0 {
+		deltaTimeSeconds = 0.0
 	}
 
-	for j, part := range group {
-		if part.PartIndex < 0 {
-			continue
-		}
+	beginIndex := 0
+	for i := 0; i < len(pm.partGroupCounts); i++ {
+		partGroupCount := pm.partGroupCounts[i]
+		pm.doFade(c, modelPtr, deltaTimeSeconds, beginIndex, partGroupCount)
+		beginIndex += partGroupCount
+	}
 
-		currentOpacities := core.GetPartOpacities(modelPtr)
-		if part.PartIndex >= len(currentOpacities) {
-			continue
-		}
-		currentOpacity := currentOpacities[part.PartIndex]
+	pm.copyPartOpacities(c, modelPtr)
+}
 
-		var newOpacity float32
-		if j == visibleIndex {
-			// Fade in
-			if currentOpacity < 1.0 {
-				newOpacity = currentOpacity + float32(deltaTime/fadeInTime)
-				if newOpacity > 1.0 {
-					newOpacity = 1.0
-				}
+// doFade applies the cross-fade algorithm for a single pose group.
+// Matches the official SDK's CubismPose::DoFade exactly:
+//   - Find the first part whose parameter > Epsilon as visible
+//   - Fade in the visible part linearly
+//   - For hidden parts, calculate opacity using Phi intersection and BackOpacityThreshold
+func (pm *PoseManager) doFade(c core.Core, modelPtr uintptr, deltaTimeSeconds float64, beginIndex, partGroupCount int) {
+	visiblePartIndex := -1
+	newOpacity := float32(1.0)
+
+	// Find the currently visible part
+	for i := beginIndex; i < beginIndex+partGroupCount; i++ {
+		pd := &pm.partGroups[i]
+		partIndex := pd.PartIndex
+		paramIndex := pd.ParameterIndex
+
+		// Get parameter value by index
+		var paramValue float32
+		if paramIndex >= 0 {
+			if pm.idManager != nil {
+				paramValue = c.GetParameterValueByIndex(modelPtr, paramIndex)
 			} else {
+				paramValue = c.GetParameterValue(modelPtr, pd.PartId)
+			}
+		}
+
+		if paramValue > Epsilon {
+			if visiblePartIndex >= 0 {
+				break // Only the first visible part is found
+			}
+
+			visiblePartIndex = i
+
+			if pm.fadeTimeSeconds == 0.0 {
+				newOpacity = 1.0
+				continue
+			}
+
+			// Get current opacity and calculate fade-in
+			var currentOpacity float32
+			if pm.idManager != nil {
+				currentOpacity = c.GetPartOpacityByIndex(modelPtr, partIndex)
+			} else {
+				opacities := c.GetPartOpacities(modelPtr)
+				if partIndex >= 0 && partIndex < len(opacities) {
+					currentOpacity = opacities[partIndex]
+				}
+			}
+
+			newOpacity = currentOpacity + float32(deltaTimeSeconds/pm.fadeTimeSeconds)
+			if newOpacity > 1.0 {
 				newOpacity = 1.0
 			}
-		} else {
-			// Fade out
-			if currentOpacity > 0 {
-				newOpacity = currentOpacity - float32(deltaTime/fadeInTime)
-				if newOpacity < 0 {
-					newOpacity = 0
-				}
+		}
+	}
+
+	// Default to first part if none visible
+	if visiblePartIndex < 0 {
+		visiblePartIndex = beginIndex
+		newOpacity = 1.0
+	}
+
+	// Set opacity for visible and hidden parts
+	for i := beginIndex; i < beginIndex+partGroupCount; i++ {
+		pd := &pm.partGroups[i]
+		partsIndex := pd.PartIndex
+
+		if partsIndex < 0 {
+			continue
+		}
+
+		if visiblePartIndex == i {
+			// Visible part: set new opacity directly
+			if pm.idManager != nil {
+				c.SetPartOpacityByIndex(modelPtr, partsIndex, newOpacity)
 			} else {
-				newOpacity = 0
+				c.SetPartOpacity(modelPtr, pd.PartId, newOpacity)
+			}
+		} else {
+			// Hidden part: calculate opacity using cross-fade algorithm
+			var opacity float32
+			if pm.idManager != nil {
+				opacity = c.GetPartOpacityByIndex(modelPtr, partsIndex)
+			} else {
+				opacities := c.GetPartOpacities(modelPtr)
+				if partsIndex < len(opacities) {
+					opacity = opacities[partsIndex]
+				}
+			}
+
+			var a1 float32 // calculated opacity boundary
+			if newOpacity < Phi {
+				// Line through (0,1) and (Phi, Phi)
+				a1 = newOpacity*(Phi-1.0)/Phi + 1.0
+			} else {
+				// Line through (1,0) and (Phi, Phi)
+				a1 = (1.0 - newOpacity) * Phi / (1.0 - Phi)
+			}
+
+			// Limit background visibility ratio
+			backOpacity := (1.0 - a1) * (1.0 - newOpacity)
+			if backOpacity > BackOpacityThreshold {
+				a1 = 1.0 - BackOpacityThreshold/(1.0-newOpacity)
+			}
+
+			// Only reduce opacity, never increase for hidden parts
+			if opacity > a1 {
+				opacity = a1
+			}
+
+			if pm.idManager != nil {
+				c.SetPartOpacityByIndex(modelPtr, partsIndex, opacity)
+			} else {
+				c.SetPartOpacity(modelPtr, pd.PartId, opacity)
+			}
+		}
+	}
+}
+
+// copyPartOpacities copies opacity from parent parts to their linked parts.
+// Matches the official SDK's CubismPose::CopyPartOpacities.
+// This is called after DoFade for all groups, separate from the fade logic.
+func (pm *PoseManager) copyPartOpacities(c core.Core, modelPtr uintptr) {
+	for i := range pm.partGroups {
+		pd := &pm.partGroups[i]
+
+		if len(pd.Link) == 0 {
+			continue
+		}
+
+		// Get this part's opacity
+		var opacity float32
+		if pm.idManager != nil {
+			opacity = c.GetPartOpacityByIndex(modelPtr, pd.PartIndex)
+		} else {
+			opacities := c.GetPartOpacities(modelPtr)
+			if pd.PartIndex >= 0 && pd.PartIndex < len(opacities) {
+				opacity = opacities[pd.PartIndex]
 			}
 		}
 
-		core.SetPartOpacity(modelPtr, part.PartId, newOpacity)
-
-		// Copy opacity to linked parts
-		for _, link := range part.Link {
-			if link.PartIndex >= 0 {
-				core.SetPartOpacity(modelPtr, link.PartId, newOpacity)
+		// Copy to linked parts
+		for j := range pd.Link {
+			linkPart := &pd.Link[j]
+			if linkPart.PartIndex < 0 {
+				continue
+			}
+			if pm.idManager != nil {
+				c.SetPartOpacityByIndex(modelPtr, linkPart.PartIndex, opacity)
+			} else {
+				c.SetPartOpacity(modelPtr, linkPart.PartId, opacity)
 			}
 		}
 	}
@@ -181,11 +331,6 @@ func findIndex(ids []string, id string) int {
 }
 
 // getParameterIds gets all parameter IDs from the core
-func getParameterIds(core core.Core, modelPtr uintptr) []string {
-	params := core.GetParameters(modelPtr)
-	ids := make([]string, len(params))
-	for i, p := range params {
-		ids[i] = p.Id
-	}
-	return ids
+func getParameterIds(c core.Core, modelPtr uintptr) []string {
+	return c.GetParameterIds(modelPtr)
 }

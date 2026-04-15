@@ -49,12 +49,24 @@ func (c *Core) GetParameters(modelPtr uintptr) []parameter.Parameter {
 	return base.GetParameters(&c.funcs, modelPtr)
 }
 
+func (c *Core) GetParameterIds(modelPtr uintptr) []string {
+	return base.GetParameterIds(&c.funcs, modelPtr)
+}
+
 func (c *Core) GetParameterValue(modelPtr uintptr, id string) float32 {
 	return base.GetParameterValue(&c.funcs, modelPtr, id)
 }
 
 func (c *Core) SetParameterValue(modelPtr uintptr, id string, value float32) {
 	base.SetParameterValue(&c.funcs, modelPtr, id, value)
+}
+
+func (c *Core) GetParameterValueByIndex(modelPtr uintptr, index int) float32 {
+	return base.GetParameterValueByIndex(&c.funcs, modelPtr, index)
+}
+
+func (c *Core) SetParameterValueByIndex(modelPtr uintptr, index int, value float32) {
+	base.SetParameterValueByIndex(&c.funcs, modelPtr, index, value)
 }
 
 func (c *Core) GetPartIds(modelPtr uintptr) []string {
@@ -67,6 +79,34 @@ func (c *Core) GetPartOpacities(modelPtr uintptr) []float32 {
 
 func (c *Core) SetPartOpacity(modelPtr uintptr, id string, value float32) {
 	base.SetPartOpacity(&c.funcs, modelPtr, id, value)
+}
+
+func (c *Core) SetPartOpacityByIndex(modelPtr uintptr, index int, value float32) {
+	base.SetPartOpacityByIndex(&c.funcs, modelPtr, index, value)
+}
+
+func (c *Core) GetPartOpacityByIndex(modelPtr uintptr, index int) float32 {
+	return base.GetPartOpacityByIndex(&c.funcs, modelPtr, index)
+}
+
+func (c *Core) GetParameterCount(modelPtr uintptr) int {
+	return base.GetParameterCount(&c.funcs, modelPtr)
+}
+
+func (c *Core) GetParameterValues(modelPtr uintptr) []float32 {
+	return base.GetParameterValues(&c.funcs, modelPtr)
+}
+
+func (c *Core) GetParameterMinimumValues(modelPtr uintptr) []float32 {
+	return base.GetParameterMinimumValues(&c.funcs, modelPtr)
+}
+
+func (c *Core) GetParameterMaximumValues(modelPtr uintptr) []float32 {
+	return base.GetParameterMaximumValues(&c.funcs, modelPtr)
+}
+
+func (c *Core) GetParameterDefaultValues(modelPtr uintptr) []float32 {
+	return base.GetParameterDefaultValues(&c.funcs, modelPtr)
 }
 
 func (c *Core) GetSortedDrawableIndices(modelPtr uintptr) []int {
